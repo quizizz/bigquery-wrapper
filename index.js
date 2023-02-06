@@ -113,10 +113,11 @@ class BigQuery {
    * @param {string} tableName - name of the table to use
    * @param  {Object} schema - a comma-separated list of name:type pairs.
    *   Valid types are "string", "integer", "float", "boolean", and "timestamp".
+   * @param  {Object} timePartitioning - an object with the following properties: type: DAY, field: string
    *
    * @return {boolean}
    */
-  createTable(datasetName, tableName, schema = null) {
+  createTable(datasetName, tableName, schema = null, timePartitioning = null) {
     this.log(`Creating table ${tableName} in ${datasetName}`);
     // check if table exists
     const dataset = this.getDataset(datasetName);
@@ -129,6 +130,9 @@ class BigQuery {
       }
       if (exists === false && schema) {
         const options = { schema };
+        if (timePartitioning) {
+          options.timePartitioning = timePartitioning;
+        }
         return table.create(options).then(() => {
           this.success(`Table "${datasetName}.${tableName}" created`);
           return true;
